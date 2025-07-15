@@ -1,5 +1,3 @@
-import sys
-import subprocess
 from cleo.helpers import argument
 from poetry.console.commands.command import Command
 
@@ -17,7 +15,7 @@ class CloversMainCommand(Command):
     name = "clovers"
     description = "Manage your clovers project"
     arguments = [
-        argument("cmd", optional=True, description="update/create"),
+        argument("cmd", optional=True, description="update/create/run"),
         argument("name", optional=True, description="name"),
     ]
 
@@ -29,19 +27,6 @@ class CloversMainCommand(Command):
                 return 0
             case "update":
                 return self.call("update", "--only clovers-plugins")
-            case "create":
-                project_name = self.argument("name") or self.ask("Please enter the project name:")
-                if not project_name.strip():
-                    self.line("Error: Project name cannot be empty", style="error")
-                    return 1
-                try:
-                    subprocess.run([sys.executable, "-m", "poetry", "clovers", "new", "client", project_name], check=True)
-                except subprocess.CalledProcessError as e:
-                    self.line(f"Return code: {e.returncode}", "error")
-                    self.line(f"Error Output:\n{e.stderr}", "error")
-                    return e.returncode
-                return 0
-
             case "run":
                 return self.call("run", "args bot.py")
             case _:

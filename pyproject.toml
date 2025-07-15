@@ -17,8 +17,11 @@ clovers = "poetry_clovers_plugin.plugin:CloversApplicationPlugin"
 
 [tool.poetry.group.dev.dependencies]
 pydantic = "^2.11.7"
+httpx = "^0.28.1"
+websockets = "^15.0.1"
 clovers = { path = "D:/CLOVERS/clovers", develop = true }
 clovers-client = { path = "D:/CLOVERS/clovers-client", develop = true }
+
 
 [tool.poetry.scripts]
 clovers = "poetry_clovers_plugin.scripts:main"
