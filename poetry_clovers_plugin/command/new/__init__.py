@@ -102,29 +102,12 @@ class CloversNewCommand(Command):
         except Exception as e:
             self.line(f"copy template failed: {e}", "error")
             return 1
-
-        choices = ["onebot", "console", "qq"]
-        client = self.ask(f"please choose a client {choices}", default="onebot")
-        row = choices.index(client)
-        file = path / "bot.py"
-        with file.open("r") as f:
-            lines = f.readlines()
-        lines[row] = lines[row][2:]
-        with file.open("w") as f:
-            f.writelines(lines)
-        try:
-            subprocess.run([sys.executable, "-m", "poetry", "init", "--python", ">=3.12,<4.0.0"], cwd=name, check=True)
-            pyproject = PyProjectTOML(Path.cwd() / path / "pyproject.toml")
-            pyproject.data.setdefault("tool", {}).setdefault("poetry", {})["package-mode"] = False
-            pyproject.save()
-            subprocess.run([sys.executable, "-m", "poetry", "add", f"clovers_client[{client}]"], cwd=name, check=True)
-        except subprocess.CalledProcessError as e:
-            self.line(f"Return code: {e.returncode}", "error")
-            self.line(f"Error Output:\n{e.stderr}", "error")
-            return e.returncode
-        except Exception as e:
-            self.line(f"Error: {e}", "error")
-            return 1
+        client = self.ask(f"please choose a client [onebot,console,qq]:", default="onebot")
+        return_code = crerate_client(name, client)
+        if return_code != 0:
+            self.line(f"Error: {return_code}", "error")
+            return return_code
+        (path / "bot.py").write_text(client_code(client))
         return 0
 
     def plugin_handle(self) -> int:
@@ -140,3 +123,33 @@ class CloversNewCommand(Command):
         if return_code != 0:
             return return_code
         return self.copy_template(name, TEMPLATE_ADAPTER_DIR)
+
+
+def client_code(client: str) -> str:
+    if client == "onebot":
+        code = "from clovers_client.onebot.v11.client import __client__ as client\n"
+    else:
+        code = f"from clovers_client.{client}.client import __client__ as client\n"
+    code += "import asyncio\n\n"
+    code += "asyncio.run(client.run())\n"
+    return code
+
+
+def crerate_client(name: str, client: str) -> int:
+    command = (
+        sys.executable,
+        "-m",
+        "poetry",
+        "init",
+        "--name",
+        name,
+        "--python",
+        ">=3.12,<4.0.0",
+        "--dependency",
+        f"clovers_client[{client}]",
+    )
+    p = subprocess.run(command, cwd=name)
+    pyproject = PyProjectTOML(Path.cwd() / name / "pyproject.toml")
+    pyproject.data.setdefault("tool", {}).setdefault("poetry", {})["package-mode"] = False
+    pyproject.save()
+    return p.returncode
