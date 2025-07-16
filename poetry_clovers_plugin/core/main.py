@@ -24,7 +24,7 @@ class CloversMainCommand(Command):
             case "update":
                 return self.call("update", "--only clovers-plugins")
             case "run":
-                return self.call("run", "args bot")
+                return self.call("run", "args python bot.py")
             case _:
                 self.line("Invalid command", style="error")
                 return 1
