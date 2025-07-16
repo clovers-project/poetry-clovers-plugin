@@ -64,5 +64,7 @@ class CloversCreateCommand(Command):
         if return_code != 0:
             self.line(f"Error: {return_code}", "error")
             return return_code
-        (path / "bot.py").write_text(client_code(client))
+        bot = path / "bot.py"
+        bot.write_text(client_code(client))
+        bot.chmod(0o755)
         return 0
