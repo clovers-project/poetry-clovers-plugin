@@ -1,14 +1,11 @@
 from cleo.helpers import argument
 from poetry.console.commands.command import Command
 
-
-WELCOME_TO_CLOVERS_CLI = r"""
-  ___  _      ___  __   __ ___  ___  ___         ___  _     ___ 
- / __|| |    / _ \ \ \ / /| __|| _ \/ __|       / __|| |   |_ _|
-| (__ | |__ | (_) | \   / | _| |   /\__ \      | (__ | |__  | | 
- \___||____| \___/   \_/  |___||_|_\|___/       \___||____||___|
-"""
-WELCOME_TO_CLOVERS_CLI = WELCOME_TO_CLOVERS_CLI[1:]
+WELCOME_TO_CLOVERS_CLI = r"""Welcome to Clovers CLI!
+  ___  __    _____  _  _  ____  ____  ___       ___  __    ____ 
+ / __)(  )  (  _  )( \/ )( ___)(  _ \/ __)     / __)(  )  (_  _)
+( (__  )(__  )(_)(  \  /  )__)  )   /\__ \    ( (__  )(__  _)(_ 
+ \___)(____)(_____)  \/  (____)(_)\_)(___/     \___)(____)(____)"""
 
 
 class CloversMainCommand(Command):
@@ -23,12 +20,11 @@ class CloversMainCommand(Command):
         match self.argument("cmd"):
             case None:
                 self.line(WELCOME_TO_CLOVERS_CLI)
-                self.line("Welcome to Clovers CLI!", style="comment")
                 return 0
             case "update":
                 return self.call("update", "--only clovers-plugins")
             case "run":
-                return self.call("run", "args bot.py")
+                return self.call("run", 'args "bot.py"')
             case _:
                 self.line("Invalid command", style="error")
                 return 1

@@ -4,7 +4,7 @@ from pathlib import Path
 from cleo.helpers import argument
 from poetry.console.commands.command import Command
 from poetry.pyproject.toml import PyProjectTOML
-from .template import TEMPLATE_CLIENT_DIR
+from .template import TEMPLATE_BOT_DIR
 
 
 def client_code(client: str) -> str:
@@ -32,10 +32,12 @@ def create_client(name: str, client: str) -> int:
         "--no-interaction",
     )
     p = subprocess.run(command, cwd=name)
+    if p.returncode != 0:
+        return p.returncode
     pyproject = PyProjectTOML(Path.cwd() / name / "pyproject.toml")
     pyproject.data.setdefault("tool", {}).setdefault("poetry", {})["package-mode"] = False
     pyproject.save()
-    return p.returncode
+    return subprocess.run((sys.executable, "-m", "poetry", "install"), cwd=name).returncode
 
 
 class CloversCreateCommand(Command):
@@ -53,7 +55,7 @@ class CloversCreateCommand(Command):
         import shutil
 
         try:
-            shutil.copytree(TEMPLATE_CLIENT_DIR, path, dirs_exist_ok=True)
+            shutil.copytree(TEMPLATE_BOT_DIR, path, dirs_exist_ok=True)
         except Exception as e:
             self.line(f"copy template failed: {e}", "error")
             return 1

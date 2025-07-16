@@ -44,6 +44,10 @@ class MyClient(Leaf, Client):
                 except (websockets.exceptions.ConnectionClosedError, TimeoutError):
                     logger.error("websockets reconnecting...")
                     await asyncio.sleep(5)
+                except ConnectionRefusedError as e:
+                    logger.error(f"ConnectionRefusedError:{e}")
+                    logger.error(f"Please check service on {self.ws_url}")
+                    return
                 except Exception:
                     logger.exception("something error")
                     return
