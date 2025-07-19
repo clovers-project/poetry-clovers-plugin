@@ -1,6 +1,5 @@
 from pydantic import BaseModel
 from clovers.config import Config as CloversConfig
-from functools import cache
 
 
 class Config(BaseModel):
@@ -12,7 +11,6 @@ class Config(BaseModel):
     plugin_dirs: list[str] = []
 
     @classmethod
-    @cache
     def sync_config(cls):
         """获取 `CloversConfig.environ()['clovers']` 配置并将默认配置同步到全局配置中。"""
         __config_dict__: dict = CloversConfig.environ().setdefault("clovers", {})
